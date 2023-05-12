@@ -2,15 +2,32 @@ import { db } from "../database/database.connection.js";
 import { GamesRules } from "../schemas/games.schema.js";
 
 export async function getGames(req, res) {
+    const nameSearch = req.query.name;
+
+  if (nameSearch) {
     try {
-        const games = await db.query(`SELECT * FROM games;`)
-        console.table(games.rows)
-        res.send(games.rows)
+      const result = await db.query(`
+        SELECT * FROM games
+        WHERE name iLIKE $1
+        ;`, [nameSearch + "%"]);
 
+      res.status(200).send(result.rows)
     } catch (err) {
-        res.status(500).send(err.message)
-
+      console.log(err.message);
+      res.sendStatus(500);
     }
+  } else {
+    try {
+      const result = await db.query(`
+        SELECT * FROM games
+        ;`);
+
+      res.status(200).send(result.rows)
+    } catch (err) {
+      console.log(err.message);
+      res.sendStatus(500);
+    }
+  }
 }
 
 export async function createGames(req, res) {

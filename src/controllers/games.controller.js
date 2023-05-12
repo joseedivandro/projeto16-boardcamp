@@ -15,24 +15,21 @@ export async function getGames(req, res) {
 
 export async function createGames(req, res) {
     try {
-        const { name, image, stockTotal, categoryId, pricePerDay } = req.body;
-        const { error } = GamesRules.validate({ name, image, stockTotal, categoryId, pricePerDay });
-        const categoryExists = await connection.query('SELECT * FROM categories WHERE id = $1', [categoryId]);
-        const gameExists = await connection.query('SELECT * FROM games WHERE name = $1', [name]);
+        const { name, image, stockTotal,  pricePerDay } = req.body;
+        const { error } = GamesRules.validate({ name, image, stockTotal, pricePerDay });
+        const gameExists = await db.query('SELECT * FROM games WHERE name = $1', [name]);
         console.log(error)
-        if (!categoryExists.rows.length || error) {
+        if (error) {
             res.sendStatus(400);
-        }
-        else if (gameExists.rows.length) {
+        } else if (gameExists.rows.length) {
             res.sendStatus(409);
-        }
-        else {
-            await connection.query('INSERT INTO games (name, image, "stockTotal", "categoryId", "pricePerDay") VALUES ($1, $2, $3, $4, $5)', [name, image, stockTotal, categoryId, pricePerDay])
+        } else {
+            await db.query('INSERT INTO games (name, image, "stockTotal",  "pricePerDay") VALUES ($1, $2, $3, $4)', [name, image, stockTotal, pricePerDay]);
             res.sendStatus(201);
         }
     } catch (err) {
         console.log(err.message);
-        res.sendStatus(500);
+        res.status(500).send(err.message);
     }
-
 }
+

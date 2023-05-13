@@ -6,7 +6,7 @@ const rentalRouter = Router()
 
 rentalRouter.post('/rentals', createRental)
 
-rentalRouter.delete('/rentals:id', deleteRental)
+rentalRouter.delete('/rentals/:id', deleteRental)
 
 rentalRouter.post('/rentals:id/return',returnRental)
 

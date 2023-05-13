@@ -56,3 +56,49 @@ export async function getCustomers(req, res) {
         }
     }
 }
+
+
+export async function getId (req, res) {
+
+    try {
+        const id = req.params.id;
+        const result = await db.query('SELECT * FROM customers WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+          res.sendStatus(404);
+        } else {
+          result.rows = result.rows.map(e => ({
+            ...e,
+            birthday: new Date(e.birthday).toLocaleDateString('pt-Br')
+          }));
+          res.status(200).send(result.rows[0]);
+        }
+      } catch (err) {
+        console.log(err.message);
+        res.sendStatus(500);
+      }
+
+}
+
+export async function putId (req, res) {
+    try {
+        const id = req.params.id
+        const { name, phone, cpf, birthday } = req.body;
+        const { error } = CustomersRules.validate({ name, phone, cpf, birthday });
+        const custumerExists = await db.query('SELECT * FROM customers WHERE cpf = $1 AND id <> $2;', [cpf, id])
+    
+        if (error) {
+          res.sendStatus(400)
+        }
+        else if (custumerExists.rows.length > 0) {
+          res.sendStatus(409)
+        }
+        else {
+          await db.query('UPDATE customers SET name = $1, phone = $2, cpf = $3, birthday = $4 WHERE id = $5;', [name, phone, cpf, birthday, id]);
+          res.sendStatus(200)
+        }
+      } catch (err) {
+        console.log(err.message);
+        res.sendStatus(500);
+      }
+
+}

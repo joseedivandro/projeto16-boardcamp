@@ -8,7 +8,7 @@ rentalRouter.post('/rentals', createRental)
 
 rentalRouter.delete('/rentals/:id', deleteRental)
 
-rentalRouter.post('/rentals:id/return',returnRental)
+rentalRouter.post('/rentals/:id/return',returnRental)
 
 
 export default rentalRouter

@@ -8,8 +8,8 @@ customersRouter.post("/customers", createCustomers);
 
 customersRouter.get("/customers", getCustomers);
 
-customersRouter.get("/:id", getId);
+customersRouter.get("/customers/:id", getId);
 
-customersRouter.put("/:id", putId)
+customersRouter.put("/customers/:id", putId)
 
 export default customersRouter

@@ -5,7 +5,7 @@ export const CustomersRules = joi.object({
     name: joi.string().empty().required(),
     phone: joi.string().min(10).max(11).pattern(/^[0-9]+$/).required(),
     cpf: joi.string().length(11).empty().pattern(/^[0-9]+$/).required(),
-    birthday: joi.date().iso().required(),
+    birthday: joi.string().pattern(/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}$/).required(),
     
   });
   

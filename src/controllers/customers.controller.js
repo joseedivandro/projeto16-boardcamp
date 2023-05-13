@@ -33,10 +33,9 @@ export async function getCustomers(req, res) {
             const result = await db.query(`SELECT * FROM customers WHERE cpf iLIKE $1;`, [cpfSearch + "%"]);
             result.rows = result.rows.map(user => ({
                 ...user,
-                birthday: new Date(user.birthday).toLocaleDateString('pt-Br')
-            }
-            ));
-            res.status(200).send(result.rows)
+                birthday: new Date(user.birthday).toISOString().split('T')[0] // Formata a data como YYYY-MM-DD
+            }));
+            res.status(200).send(result.rows);
         } catch (err) {
             console.log(err.message);
             res.sendStatus(500);
@@ -46,10 +45,9 @@ export async function getCustomers(req, res) {
             const result = await db.query(`SELECT * FROM customers;`);
             result.rows = result.rows.map(user => ({
                 ...user,
-                birthday: new Date(user.birthday).toLocaleDateString('pt-Br')
-            }
-            ));
-            res.status(200).send(result.rows)
+                birthday: new Date(user.birthday).toISOString().split('T')[0] // Formata a data como YYYY-MM-DD
+            }));
+            res.status(200).send(result.rows);
         } catch (err) {
             console.log(err.message);
             res.sendStatus(500);
@@ -58,26 +56,26 @@ export async function getCustomers(req, res) {
 }
 
 
-export async function getId (req, res) {
 
+export async function getId(req, res) {
     try {
         const id = req.params.id;
         const result = await db.query('SELECT * FROM customers WHERE id = $1', [id]);
         if (result.rows.length === 0) {
-          res.sendStatus(404);
+            res.sendStatus(404);
         } else {
-          result.rows = result.rows.map(e => ({
-            ...e,
-            birthday: new Date(e.birthday).toLocaleDateString('pt-Br')
-          }));
-          res.status(200).send(result.rows[0]);
+            result.rows = result.rows.map(e => ({
+                ...e,
+                birthday: new Date(e.birthday).toISOString().split('T')[0] // Formata a data como YYYY-MM-DD
+            }));
+            res.status(200).send(result.rows[0]);
         }
-      } catch (err) {
+    } catch (err) {
         console.log(err.message);
         res.sendStatus(500);
-      }
-
+    }
 }
+
 
 export async function putId (req, res) {
     try {

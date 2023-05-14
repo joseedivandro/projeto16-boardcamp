@@ -1,9 +1,43 @@
 import { db } from "../database/database.connection.js";
 import { RentalRules } from "../schemas/rental.shema.js";
 import { differenceInDays } from 'date-fns';
+import dayjs from "dayjs";
 
 
 
+
+export async function getRental(req, res){
+  try{
+    const rental = await db.query(`SELECT
+       rentals.*,
+       customers.id AS "customers.id",
+       customers.name AS "customerName",
+       games.id AS "gameId",
+       games.name AS "gameName"
+       FROM customers
+       
+    JOIN rentals ON customers.id = rentals."customerId"
+    JOIN games ON games.id = rentals."gameId";
+    
+    `)
+    const rentals = rental?.rows.map((rentalMap)=>{
+      const {id, customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee, gameName, customerName} = rentalMap
+
+      return {
+        id, customerId, gameId, rentDate: dayjs(rentDate).format('YYYY-MM-DD'),
+        daysRented, returnDate: returnDate ? dayjs(returnDate).format('YYYY-MM-DD'): null, 
+        originalPrice, delayFee, 
+        customerId: { id: customerId, name: customerName},
+        game: {id: gameId, name: gameName}
+      }
+
+    })
+    res.send(rentals)
+
+  }catch(err){
+    res.status(500).send(err.message)
+  }
+}
 
 
 export async function createRental (req, res) {

@@ -82,7 +82,7 @@ export async function returnRental(req, res) {
     const rentedDaysOfThisGame = rentExists.daysRented;
     let delayFee = null;
 
-    if (returnDate < rentDate) {
+    if (returnDate.getTime() > rentDate.getTime()) {
       const delayDays = differenceInDays(returnDate, rentDate);
 
       if (delayDays > rentedDaysOfThisGame) {
@@ -97,6 +97,7 @@ export async function returnRental(req, res) {
     res.sendStatus(500);
   }
 }
+
 
 export async function deleteRental(req, res) {
 

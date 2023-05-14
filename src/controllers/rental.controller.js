@@ -99,7 +99,6 @@ export async function returnRental(req, res) {
 }
 
 
-
 export async function deleteRental(req, res) {
 
   try {
@@ -109,16 +108,14 @@ export async function deleteRental(req, res) {
     console.log(rentExists.rows);
     if (rentExists.rows.length === 0) {
       res.sendStatus(404);
-    }
-    if (rentExists.rows[0].returnDate !== null) {
-      res.sendStatus(400);
-    }
-    else {
+    } else if (rentExists.rows[0].returnDate === null) {
       await db.query('DELETE FROM rentals WHERE id = $1;', [id]);
       res.sendStatus(200);
+    } else {
+      res.sendStatus(400);
     }
   } catch (err) {
-    console.log(err.menssage);
+    console.log(err.message);
     res.sendStatus(500);
   }
 }

@@ -103,15 +103,16 @@ export async function deleteRental(req, res) {
   const { id } = { ...req.params };
 
   try {
+    // Verificar se o aluguel existe
     const rental = await db.query('SELECT * FROM rentals WHERE id = $1', [id]);
-    
     if (rental.rows.length === 0) {
       // Retornar código 404 se o aluguel não existe
       return res.sendStatus(404);
     }
 
-    if (!rental.rows[0].finished) {
-      // Retornar status 400 se o aluguel não foi finalizado
+    // Verificar se o aluguel foi finalizado
+    if (rental.rows[0].finished) {
+      // Retornar status 400 se o aluguel já foi finalizado
       return res.sendStatus(400);
     }
 
@@ -122,6 +123,3 @@ export async function deleteRental(req, res) {
     return res.sendStatus(500);
   }
 }
-
-
-

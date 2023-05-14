@@ -51,7 +51,6 @@ export async function createRental (req, res) {
 
 
 
-
 export async function returnRental(req, res) {
   try {
     const id = req.params.id;
@@ -86,7 +85,8 @@ export async function returnRental(req, res) {
       const delayDays = differenceInDays(returnDate, rentDate);
 
       if (delayDays > rentedDaysOfThisGame) {
-        delayFee = delayDays * pricePerDayOfThisGame;
+        const extraDays = delayDays - rentedDaysOfThisGame;
+        delayFee = extraDays * pricePerDayOfThisGame;
       }
     }
 
@@ -97,6 +97,7 @@ export async function returnRental(req, res) {
     res.sendStatus(500);
   }
 }
+
 
 
 export async function deleteRental(req, res) {

@@ -100,22 +100,26 @@ export async function returnRental(req, res) {
 
 
 export async function deleteRental(req, res) {
+  const { id } = structuredClone(req.params)
 
   try {
-    const id = req.params.id;
+    const rental = await db.query('SELECT * FROM rentals WHERE id = $1', [id])
 
-    const rentExists = await db.query('SELECT * FROM rentals WHERE id = $1;', [id]);
-    console.log(rentExists.rows);
-    if (rentExists.rows.length === 0) {
-      res.sendStatus(404);
-    } else if (rentExists.rows[0].returnDate === null) {
-      await db.query('DELETE FROM rentals WHERE id = $1;', [id]);
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(400);
+    if (rental.rows.length === 0) {
+      // Se o aluguel não existe, retorna código 404 (Not Found)
+      return res.sendStatus(404)
     }
+
+    if (!rental.rows[0].finalized) {
+      // Se o aluguel existe, mas não foi finalizado, retorna código 400 (Bad Request)
+      return res.sendStatus(400)
+    }
+
+    await db.query('DELETE FROM rentals WHERE id = $1', [id])
+
+    return res.sendStatus(200)
   } catch (err) {
-    console.log(err.message);
-    res.sendStatus(500);
+    console.log(err)
+    return res.sendStatus(500)
   }
 }

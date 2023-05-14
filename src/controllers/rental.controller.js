@@ -3,28 +3,7 @@ import { RentalRules } from "../schemas/rental.shema.js";
 
 
 
-export async function deleteRental(req, res) {
-    try {
-        const id = req.params.id;
-    
-        const rentExists = await db.query('SELECT * FROM rentals WHERE id = $1;', [id]);
-        console.log(rentExists.rows);
-        if (rentExists.rows.length === 0) {
-          res.sendStatus(404);
-        }
-        if (rentExists.rows[0].returnDate !== null) {
-          res.sendStatus(400);
-        }
-        else {
-          await db.query('DELETE FROM rentals WHERE id = $1;', [id]);
-          res.sendStatus(200);
-        }
-      } catch (err) {
-        console.log(err.menssage);
-        res.sendStatus(500);
-      }
 
-}
 
 export async function createRental (req, res) {
     try {
@@ -112,4 +91,18 @@ export async function returnRental(req, res){
         console.log(err.menssage);
         res.sendStatus(500);
       }
+}
+
+export async function deleteRental(req, res) {
+
+  const { id } = structuredClone(req.params)
+
+  try {
+      await db.query('DELETE FROM rentals WHERE id = $1', [id])
+      return res.sendStatus(200)
+
+  } catch (err) {
+      console.log(err)
+      return res.sendStatus(500)
+  }
 }

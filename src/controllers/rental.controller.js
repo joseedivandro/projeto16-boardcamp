@@ -110,9 +110,8 @@ export async function deleteRental(req, res) {
       return res.sendStatus(404);
     }
 
-    // Verificar se o aluguel foi finalizado
-    if (rental.rows[0].finished) {
-      // Retornar status 400 se o aluguel já foi finalizado
+    if (!rental.rows[0].finished) {
+      // Retornar status 400 se o aluguel não foi finalizado
       return res.sendStatus(400);
     }
 

@@ -66,9 +66,9 @@ export async function createRental (req, res) {
         const { customerId, gameId, daysRented } = req.body;
         const { error } = RentalRules.validate({ customerId, gameId, daysRented });
     
-        const gameExists = await db.query(`SELECT * FROM games WHERE id = $1`, [gameId]);
-        const customerExists = await db.query(`SELECT * FROM customers WHERE id = $1`, [customerId]);
-        const gamesRented = await db.query(`
+        const gameExist = await db.query(`SELECT * FROM games WHERE id = $1`, [gameId]);
+        const customerExist = await db.query(`SELECT * FROM customers WHERE id = $1`, [customerId]);
+        const gameRental = await db.query(`
           SELECT 
             rentals.*,
             games."stockTotal"
@@ -78,16 +78,16 @@ export async function createRental (req, res) {
           WHERE "gameId" = $1 AND rentals."returnDate" IS null;
         `, [gameId]);
     
-        const qtyRentalsOfThisGame = gamesRented.rows.length;
-        const totalStockOfThisGame = gameExists.rows[0].stockTotal;
-        const pricePerDayOfThisGame = gameExists.rows[0].pricePerDay;
+        const qtdGameRental = gameRental.rows.length;
+        const qtdStockGames = gameExist.rows[0].stockTotal;
+        const pricePerDayGames = gameExist.rows[0].pricePerDay;
     
-        if (error || gameExists.rows.length === 0 || customerExists.rows.length === 0 || (qtyRentalsOfThisGame === totalStockOfThisGame)) {
+        if (error || gameExist.rows.length === 0 || customerExist.rows.length === 0 || (qtdGameRental === qtdStockGames)) {
           res.sendStatus(400);
         } else {
           const rentDate = new Date();
           const returnDate = null;
-          const originalPrice = (daysRented * pricePerDayOfThisGame);
+          const originalPrice = (daysRented * pricePerDayGames);
           const delayFee = null;
     
           await db.query(`
@@ -132,7 +132,7 @@ export async function returnRental(req, res) {
 
     const rentDate = new Date(rentExists.rentDate);
     const returnDate = new Date();
-    const pricePerDayOfThisGame = rentExists.pricePerDay;
+    const pricePerDayGames = rentExists.pricePerDay;
     const rentedDaysOfThisGame = rentExists.daysRented;
     let delayFee = null;
 
@@ -141,7 +141,7 @@ export async function returnRental(req, res) {
 
       if (delayDays > rentedDaysOfThisGame) {
         const extraDays = delayDays - rentedDaysOfThisGame;
-        delayFee = extraDays * pricePerDayOfThisGame;
+        delayFee = extraDays * pricePerDayGames;
       }
     }
 

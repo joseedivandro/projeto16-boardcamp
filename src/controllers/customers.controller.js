@@ -7,12 +7,12 @@ export async function createCustomers(req, res) {
         const { name, phone, cpf, birthday } = req.body;
         const { error } = CustomersRules.validate({ name, phone, cpf, birthday });
 
-        const custumerExists = await db.query('SELECT * FROM customers WHERE cpf = $1;', [cpf])
+        const customerExist = await db.query('SELECT * FROM customers WHERE cpf = $1;', [cpf])
 
         if (error) {
             res.sendStatus(400)
         }
-        else if (custumerExists.rows.length > 0) {
+        else if (customerExist.rows.length > 0) {
             res.sendStatus(409)
         }
         else {
@@ -26,11 +26,11 @@ export async function createCustomers(req, res) {
 }
 
 export async function getCustomers(req, res) {
-    const cpfSearch = req.query.cpf;
+    const cpfQuery = req.query.cpf;
 
-    if (cpfSearch) {
+    if (cpfQuery) {
         try {
-            const result = await db.query(`SELECT * FROM customers WHERE cpf iLIKE $1;`, [cpfSearch + "%"]);
+            const result = await db.query(`SELECT * FROM customers WHERE cpf iLIKE $1;`, [cpfQuery + "%"]);
             result.rows = result.rows.map(user => ({
                 ...user,
                 birthday: new Date(user.birthday).toISOString().split('T')[0] // Formata a data como YYYY-MM-DD
@@ -82,12 +82,12 @@ export async function putId (req, res) {
         const id = req.params.id
         const { name, phone, cpf, birthday } = req.body;
         const { error } = CustomersRules.validate({ name, phone, cpf, birthday });
-        const custumerExists = await db.query('SELECT * FROM customers WHERE cpf = $1 AND id <> $2;', [cpf, id])
+        const customerExist = await db.query('SELECT * FROM customers WHERE cpf = $1 AND id <> $2;', [cpf, id])
     
         if (error) {
           res.sendStatus(400)
         }
-        else if (custumerExists.rows.length > 0) {
+        else if (customerExist.rows.length > 0) {
           res.sendStatus(409)
         }
         else {
